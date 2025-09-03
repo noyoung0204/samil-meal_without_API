@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>2025년 9월 급식표</title>
+    <style>
+        body {
+            font-family: 'Apple SD Gothic Neo', sans-serif;
+            background-color: #f4f6f8;
+            padding: 2rem;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+
+        .selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+        }
+
+        select {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #3498db;
+            border-radius: 0.5rem;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .meal {
+            background-color: white;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border-left: 6px solid #3498db;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            font-size: 1rem;
+        }
+
+        .date-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        .meal-text {
+            border: 1px solid #ddd;
+            background-color: #fafafa;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .meal img {
+            max-width: 100px;
+            margin: 0.3rem;
+            border-radius: 0.5rem;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>2025년 9월 급식표</h1>
+
+    <div class="selector">
+        <label for="day">날짜 선택: </label>
+        <select id="day"></select>
+    </div>
+
+    <div class="meal">
+        <div class="date-header" id="dateHeader">날짜를 선택하면 급식이 표시됩니다.</div>
+        <div id="mealBox"></div>
+    </div>
+
+    <script src="image_map.js"></script>
+
+    <script>
+        // 9월 주말, 추석 연휴(9/15~17) 등 급식 없는 날 (예시)
+        const noMealDays = [6, 7, 13, 14, 20, 21, 27, 28, 29, 30]; 
+
+        // 9월에 맞게 급식 날짜를 수정했습니다.
+        const mealData = {
+            1: `[중식]
+혼합잡곡밥 (5)
+소고기미역국 (5.6.16)
+매콤돼지갈비찜 (1.5.6.10.13.15)
+콤샐러드 (1.2.5.6.10.12.13.15.16)
+배추김치 (9)
+딸기케이크 (1.2.5.6)`,
+            2: `[중식]
+흑미밥
+건새우아욱된장국 (5.6.9)
+크림떡볶이 (2.5.10.13)
+쌈닭파채무침*쌈무 (5.6.13.15)
+배추김치 (9)
+수박음료 (13)`,
+            3: `[중식]
+유부맑은국 (5.6.7.13.18)
+쫄면무침 (5.6.12.13)
+돈까스덮밥 (1.2.5.6.7.10.12.13.18)
+배추김치 (9)
+망고스틱 (1.2.5)
+후르츠마카로니샐러드 (1.2.4.5.6.11.13)`,
+            4: `[중식]
+수수밥
+전주베테랑칼국수 (1.5.6.7.9.13.18)
+오징어초무침 (5.6.13.17)
+수원왕갈비통닭/후라이드통닭 (1.2.5.6.13.15.18)
+석박지 (9)
+과일코너 (12)
+쿨피스`,
+            5: `[중식]
+김밥볶음밥 (1.2.5.6.10.13.15.16.18)
+부산식물떡볶이 (1.5.6.13)
+오징어튀김 (1.5.6.17)
+야채튀김 (1.5.6.10)
+배추김치 (9)
+황금란 (1)
+샤인애플음료 (13)`,
+            8: `[중식]
+현미밥
+참치마요무침*김구이 (1.5.13.16.18)
+북어콩나물국 (1.5.6)
+등갈비바베큐구이 (5.6.10.12.13)
+배추김치 (9)
+황금카스테라빵 (1.2.5.6)`,
+            9: `[중식]
+차조밥
+근대된장국 (5.6)
+제육볶음 (5.6.10.13)
+삼색전 (1.5.6.9.17)
+배추겉절이 (9)
+패션후르츠라떼 (2)
+양배추쌈
+오이스틱
+쌈장 (5.6.13)`,
+            10: `[석식]
+우동국물 (1.2.5.6.7.9.13.18)
+푸실리루꼴라샐러드 (1.2.5.6.12.13)
+지코바치밥 (2.5.6.12.13.15.16.18)
+배추김치 (9)
+초코마들렌 (1.2.5.6)
+별별소떡 (1.2.5.6.10.12.13.15.16)`,
+            11: `[중식]
+기장밥
+소고기무국 (5.6.16)
+숙주나물 (5.6)
+소시지볶음 (2.5.6.10.12.13.15.16)
+멕시코식콘립 (2.5.12.13)
+배추김치 (9)
+리치캐모마일음료 (13)
+꿀자몽블랙티음료 (13)`,
+            12: `[석식]
+콘크림스프 (2.5.6.13.16)
+감말랭이과일샐러드 (1.2.4.5.12.13)
+고구마치즈롤까스 (1.2.5.6.10.11.12.13.16.18)
+배추김치 (9)
+오레오와플 (1.2.5.6)`,
+            15: `[중식]
+찰보리밥
+우거지된장국 (5.6.16)
+스크램블에그 (1.5)
+매콤푸삼볶음 (5.6.10.12.13)
+배추겉절이 (9)
+수제고르곤졸라또띠아 (2.5.6.12.13)`,
+            16: `[석식]
+밥버거 (1.2.5.6.9.13.16.18)
+계란국 (1.5.6)
+오이고추된장무침 (5.6.13)
+지파이 (1.5.6.15)
+슈니첼 (1.2.5.6.15)
+깍두기 (9)
+리얼블랙케이크 (1.2.5.6)`,
+            17: `[중식]
+비빔밥 (5.13)
+팽이버섯장국 (5.6)
+단호박범벅 (1.2.4.5.6.13)
+약고추장 (5.6.10.13)
+핫도그 (1.2.5.6.10.12.15.18)
+백김치 (9)
+초코우유 (2)`,
+            18: `[중식]
+차수수밥
+쑥갓어묵국 (1.5.6)
+오리고기김치볶음 (5.6.9.13)
+햄감자구이 (1.2.5.6.10.13.15.16)
+총각김치 (9)
+라임아이스티
+야채스틱 (5.6.13)`,
+            19: `[중식]
+햄치즈크로플버거 (1.2.5.6)
+그린샐러드*키위드레싱 (1.2.5.6.13)
+나시고랭볶음밥 (5.6.9.13.15.16.18)
+카다이프새우튀김 (1.2.5.6.9.12.13)
+배추김치 (9)
+생크림요거트 (2)`,
+            22: `[중식]
+혼합잡곡밥 (5)
+청경채무침 (5.6)
+갈릭버터닭다리살구이 (2.5.6.13.15.18)
+폴더와플 (1.2.5.6)
+배추김치 (9)`,
+            23: `[중식]
+삼각주먹밥 (1.2.5.6.10)
+풀드포크버거 (1.2.5.6.10.12.13.16)
+그래놀라샐러드 (1.2.5.6.12.13)
+웨지감자 (5.12)
+크런치바 (2.4.14.19)`,
+            24: `[중식]
+완두콩밥
+자장소스 (1.5.6.10.12.13.16.18)
+버터진미채구이 (1.2.4.5.6.13.17)
+탕수육 (1.5.6.10.11.12.13.18)
+깍두기 (9)
+젤리블리`,
+            25: `[중식]
+차조밥
+근대된장국 (5.6)
+돼지갈비찜 (1.5.6.10.13.15.16)
+(자율)샐러드*딸기드레싱 (1.2.5.13)
+도토리묵무침 (5.6.13)
+배추김치 (9)
+설빙아이스크림 (1.2.5)`,
+            26: `[중식]
+후리가케밥 (1.2.5.6.9.13.16.18)
+참치양념 (1.5.13.16.18)
+비빔면 (1.5.6.13)
+고기만두 (1.5.6.10.16.18)
+유린기 (1.5.6.13.15.18)
+배추김치 (9)`
+        };
+
+        const daySelect = document.getElementById("day");
+        const mealBox = document.getElementById("mealBox");
+        const dateHeader = document.getElementById("dateHeader");
+        const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        const weekdayShort = ['일', '월', '화', '수', '목', '금', '토'];
+
+        for (let i = 1; i <= 30; i++) {
+            const date = new Date(2025, 8, i); 
+            const weekday = weekdayShort[date.getDay()];
+            const option = document.createElement("option");
+            option.value = i;
+            option.textContent = `9월 ${i}일 (${weekday})`;
+            daySelect.appendChild(option);
+        }
+
+        function showMeal(day) {
+            const date = new Date(2025, 8, day); 
+            const weekday = weekdays[date.getDay()];
+            dateHeader.textContent = `9월 ${day}일 (${weekday})`;
+
+            mealBox.innerHTML = "";
+
+            if (noMealDays.includes(day)) {
+                mealBox.textContent = "급식이 없습니다.";
+            } else if (mealData[day]) {
+                const textLines = mealData[day].split("\n");
+
+                const textDiv = document.createElement("div");
+                textDiv.className = "meal-text";
+                textDiv.textContent = mealData[day];
+                mealBox.appendChild(textDiv);
+
+                const imgDiv = document.createElement("div");
+                // imageMap 변수가 정의되어 있어야 아래 코드가 동작합니다. (image_map.js)
+                if (typeof imageMap !== 'undefined') {
+                    for (const line of textLines) {
+                        const menu = line.trim();
+                        // 괄호와 공백을 제거하고 이미지 맵을 검색
+                        const cleanMenu = menu.replace(/\s*\(\d+(\.\d+)*\)/g, '').trim();
+                        if (imageMap[cleanMenu]) {
+                            const img = document.createElement("img");
+                            img.src = imageMap[cleanMenu];
+                            img.alt = cleanMenu;
+                            imgDiv.appendChild(img);
+                        }
+                    }
+                }
+                mealBox.appendChild(imgDiv);
+            } else {
+                mealBox.textContent = "급식 정보가 없습니다.";
+            }
+        }
+
+        daySelect.addEventListener("change", () => {
+            const selectedDay = parseInt(daySelect.value);
+            showMeal(selectedDay);
+        });
+
+        const firstMealDay = Object.keys(mealData)[0];
+        if (firstMealDay) {
+            daySelect.value = firstMealDay;
+            showMeal(parseInt(firstMealDay));
+        }
+    </script>
+
+</body>
+</html>
