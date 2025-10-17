@@ -1,120 +1,152 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>2025년 10월 급식표</title>
-    <style>
-        body {
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            background-color: #f4f6f8;
-            padding: 2rem;
-            color: #333;
-        }
+  <meta charset="UTF-8">
+  <title>2025년 10월 급식표</title>
+  <style>
+    body {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f4f6f8;
+      padding: 2rem;
+      color: #333;
+    }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 2rem;
-        }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
 
-        .selector {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            gap: 0.5rem;
-        }
+    .selector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      gap: 0.5rem;
+    }
 
-        select {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            border: 1px solid #3498db;
-            border-radius: 0.5rem;
-            background-color: #fff;
-            color: #333;
-        }
+    select {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #3498db;
+      border-radius: 0.5rem;
+      background-color: #fff;
+      color: #333;
+    }
 
-        .meal {
-            background-color: white;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            border-left: 6px solid #3498db;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            font-size: 1rem;
-        }
+    .meal {
+      background-color: white;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      border-left: 6px solid #3498db;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      font-size: 1rem;
+    }
 
-        .date-header {
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-            color: #2c3e50;
-        }
+    .date-header {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
 
-        .meal-text {
-            border: 1px solid #ddd;
-            background-color: #fafafa;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
+    .meal-text {
+      border: 1px solid #ddd;
+      background-color: #fafafa;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
 
-        .meal img {
-            max-width: 100px;
-            margin: 0.3rem;
-            border-radius: 0.5rem;
-            vertical-align: middle;
-        }
-    </style>
+    .meal img {
+      max-width: 100px;
+      margin: 0.3rem;
+      border-radius: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* ✅ 반응형: 모바일 화면에서 보기 좋게 조정 */
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .selector {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      select {
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      .meal {
+        width: 100%;
+        padding: 1rem;
+        font-size: 0.95rem;
+        border-left: 4px solid #3498db;
+      }
+
+      .meal img {
+        max-width: 80px;
+      }
+
+      .date-header {
+        font-size: 1rem;
+      }
+    }
+  </style>
 </head>
 <body>
+  <h1>2025년 10월 급식표</h1>
 
-<h1>2025년 10월 급식표</h1>
-
-<div class="selector">
+  <div class="selector">
     <label for="day">날짜 선택: </label>
     <select id="day"></select>
-</div>
+  </div>
 
-<div class="meal">
+  <div class="meal">
     <div class="date-header" id="dateHeader">날짜를 선택하면 급식이 표시됩니다.</div>
     <div id="mealBox"></div>
-</div>
+  </div>
 
-<script src="image_map.js"></script>
+  <script src="image_map.js"></script>
 
-<script>
-    // 10월 급식 없는 날: 주말 + OCR에 없는 날 3~12일
-    const noMealDays = [3,4,5,6,7,8,9,10,11,12,4,5,11,12,18,19,25,26]; // 주말 추가 필요시 월 기준 확인
+  <script>
+    const noMealDays = [3,4,5,6,7,8,9,10,11,12,18,19,25,26];
 
-    // 10월 급식 있는 날 (OCR 기준 음식만, 숫자 표기 유지)
     const mealData = {
-        1: `[중식]
+      1: `[중식]
 대패제육덮밥 (5.6.10.13)
 미소장국 (5.6)
 새우까스 (1.5.6.9.13)
 배추김치 (9)
 컵과일 (1.2.5.6)`,
-
-        2: `[중식]
+      2: `[중식]
 핫치즈오야꼬동 (1.2.5.6.12.13.15.16.18)
 콩나물국 (5.6)
 근대된장무침 (5.6)
 만두탕수 (1.5.6.10.11.13.16.18)
 나박김치 (9)
 참쌀약과 (1.5.6)`,
-
-        13: `[중식]
+      13: `[중식]
 간장돼지불고기 (5.6.10.13.16)
 고로케*케칩 (1.5.6.12.18)
 배추김치 (9)
 쿠앤크케이크 (1.2.5.6.14)`,
-
-        14: `[중식]
+      14: `[중식]
 김치알밥 (5.6.9.13.18)
 꼬치어묵국 (1.5.6)
 아몬드멸치볶음 (5.6.13)
@@ -122,16 +154,14 @@
 치폴레폭립 (10)
 백김치 (9)
 펑리수휘낭시에 (1.2.5.6)`,
-
-        15: `[중식]
+      15: `[중식]
 참치마요덮밥 (1.5.6.12.13.16.18)
 우동국물 (1.2.5.6.7.9.13.18)
 찰도그롤 (1.2.5.6.10.12.15.18)
 알감자콘버터구이 (1.2.5.6.13)
 배추김치 (9)
 레드자몽음료 (13)`,
-
-        16: `[중식]
+      16: `[중식]
 아욱된장국 (5.6.9)
 수육 (5.6.10)
 무생채 (13)
@@ -141,8 +171,7 @@
 과일푸딩
 야채스틱 (5.6.13)
 상추*쌈장 (4.5.6.13)`,
-
-        17: `[중식]
+      17: `[중식]
 참치유부롤초밥 (1.2.5.6.9.13.16.18)
 치아바타샌드위치 (1.2.5.6)
 후레이크샐러드*흑임자드레싱 (1.5.6.13)
@@ -150,55 +179,48 @@
 불고기피자 (1.2.5.6)
 백김치 (9)
 딸기우유 (2)`,
-
-        20: `[중식]
+      20: `[중식]
 찰보리밥
 김치찌개 (5.6.9.10)
 간장찜닭 (5.6.13.15.16.18)
 건파래볶음 (5.13)
 츠쿠네 (5.6.10.13.15.16)
 배추겉절이 (9)`,
-
-        21: `[중식]
+      21: `[중식]
 육개장 (1.5.6.16)
 계란찜 (1)
 미니돈까스 (1.2.5.6.10.11.12.13.16.18)
 석박지 (9)
 과일코너
 초코볼 (2.5)`,
-
-        22: `[중식]
+      22: `[중식]
 토마토스파게티 (1.2.5.6.10.12.13.15.16)
 치킨샐러드 (1.2.5.6.13.15.18)
 끌레도르아이스크림 (1.2.5)
 단무지오이피클
 갈릭바게트 (2.5.6)`,
-
-        23: `[중식]
+      23: `[중식]
 차조밥
 된장찌개 (5.6)
 츄러스떡맛탕 (1.5.6.13)
 훈제돈육구이*무쌈 (10)
 배추김치 (9)
 망고음료 (13)`,
-
-        24: `[중식]
+      24: `[중식]
 카레소스 (2.5.6.10.12.13.16.18)
 완두콩밥
 양배추샐러드 (1.5.12.13)
 지코바닭다리구이 (5.6.12.13.15.18)
 배추김치 (9)
 마카롱 (1.2.6)`,
-
-        27: `[중식]
+      27: `[중식]
 미소부타동 (5.6.10.13.16.18)
 유부맑은국 (5.6.7.13.18)
 하와이안샐러드 (12.13)
 에그참치브리또 (1.2.5.6.12.13.16.18)
 배추김치 (9)
 허쉬크림파이 (1.2.5.6)`,
-
-        28: `[중식]
+      28: `[중식]
 수수밥
 돈육짜글이찌개 (1.2.5.6.9.10.13.15.16)
 꼬치없는소떡 (1.2.5.6.10.12.13.15.16)
@@ -206,23 +228,20 @@
 배추겉절이 (9)
 옥수수라떼 (5)
 요구르트 (2)`,
-
-        29: `[중식]
+      29: `[중식]
 햄야채볶음밥 (1.2.5.6.10.13.15.16.18)
 김치우동 (1.2.5.6.7.9.13.17.18)
 시리얼과일샐러드 (1.2.4.5.6.12.13)
 닭꼬치튀김 (5.6.13.15)
 사과음료 (5.13)`,
-
-        30: `[중식]
+      30: `[중식]
 흑미밥
 조랭이떡국 (1.5.6.16)
 오코노미야키카츠 (1.5.10)
 배추김치 (9)
 미니딸기롤케이크 (1.2.5.6)
 야채스틱 (5.6.13)`,
-
-        31: `[중식]
+      31: `[중식]
 양송이스프 (2.5.6.13.16)
 하트버거 (1.2.5.6.10.12.15.16)
 콘슬로우 (1.5.13)
@@ -236,66 +255,64 @@
     const weekdayShort = ['일', '월', '화', '수', '목', '금', '토'];
 
     for (let i = 1; i <= 31; i++) {
-        const date = new Date(2025, 9, i); 
-        const weekday = weekdayShort[date.getDay()];
-        const option = document.createElement("option");
-        option.value = i;
-        option.textContent = `10월 ${i}일 (${weekday})`;
-        daySelect.appendChild(option);
+      const date = new Date(2025, 9, i);
+      const weekday = weekdayShort[date.getDay()];
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = `10월 ${i}일 (${weekday})`;
+      daySelect.appendChild(option);
     }
 
     function showMeal(day) {
-        const date = new Date(2025, 9, day); 
-        const weekday = weekdays[date.getDay()];
-        dateHeader.textContent = `10월 ${day}일 (${weekday})`;
+      const date = new Date(2025, 9, day);
+      const weekday = weekdays[date.getDay()];
+      dateHeader.textContent = `10월 ${day}일 (${weekday})`;
 
-        mealBox.innerHTML = "";
+      mealBox.innerHTML = "";
 
-        if (noMealDays.includes(day)) {
-            mealBox.textContent = "급식이 없습니다.";
-        } else if (mealData[day]) {
-            const textDiv = document.createElement("div");
-            textDiv.className = "meal-text";
-            textDiv.textContent = mealData[day];
-            mealBox.appendChild(textDiv);
+      if (noMealDays.includes(day)) {
+        mealBox.textContent = "급식이 없습니다.";
+      } else if (mealData[day]) {
+        const textDiv = document.createElement("div");
+        textDiv.className = "meal-text";
+        textDiv.textContent = mealData[day];
+        mealBox.appendChild(textDiv);
 
-            const imgDiv = document.createElement("div");
-            if (typeof imageMap !== 'undefined') {
-                const lines = mealData[day].split("\n");
-                for (const line of lines) {
-                    const menu = line.trim();
-                    const cleanMenu = menu.replace(/\s*\(\d+(\.\d+)*\)/g, '').trim();
-                    if (imageMap[cleanMenu]) {
-                        const img = document.createElement("img");
-                        img.src = imageMap[cleanMenu];
-                        img.alt = cleanMenu;
-                        imgDiv.appendChild(img);
-                    }
-                }
+        const imgDiv = document.createElement("div");
+        if (typeof imageMap !== 'undefined') {
+          const lines = mealData[day].split("\n");
+          for (const line of lines) {
+            const menu = line.trim();
+            const cleanMenu = menu.replace(/\s*\(\d+(\.\d+)*\)/g, '').trim();
+            if (imageMap[cleanMenu]) {
+              const img = document.createElement("img");
+              img.src = imageMap[cleanMenu];
+              img.alt = cleanMenu;
+              imgDiv.appendChild(img);
             }
-            mealBox.appendChild(imgDiv);
-        } else {
-            mealBox.textContent = "급식 정보가 없습니다.";
+          }
         }
+        mealBox.appendChild(imgDiv);
+      } else {
+        mealBox.textContent = "급식 정보가 없습니다.";
+      }
     }
 
     daySelect.addEventListener("change", () => {
-        const selectedDay = parseInt(daySelect.value);
-        showMeal(selectedDay);
+      const selectedDay = parseInt(daySelect.value);
+      showMeal(selectedDay);
     });
 
-    // 오늘 날짜 기준으로 급식 표시
     const today = new Date();
     const todayDay = today.getDate();
     if (mealData[todayDay] && !noMealDays.includes(todayDay)) {
-        daySelect.value = todayDay;
-        showMeal(todayDay);
+      daySelect.value = todayDay;
+      showMeal(todayDay);
     } else {
-        const firstMealDay = Object.keys(mealData).sort((a,b)=>a-b)[0];
-        daySelect.value = firstMealDay;
-        showMeal(parseInt(firstMealDay));
+      const firstMealDay = Object.keys(mealData).sort((a, b) => a - b)[0];
+      daySelect.value = firstMealDay;
+      showMeal(parseInt(firstMealDay));
     }
-</script>
-
+  </script>
 </body>
 </html>
